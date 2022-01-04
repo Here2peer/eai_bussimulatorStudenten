@@ -43,13 +43,12 @@ public class Producer {
     }
 
     private Session createSession() throws JMSException {
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        return session;
+
+        return connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
     private Destination createDestiantion(String queueName) throws JMSException {
-        Destination destination = session.createTopic(queueName);
-        return destination;
+        return session.createTopic(queueName);
     }
 
     private MessageProducer createMessageProducer(Destination destination) throws JMSException {
