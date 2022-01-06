@@ -10,9 +10,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 enum type {TOPIC, QUEUE}
 
 public class Producer {
-    private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-    private static String subject = "json_topic";
-    
+
     private Session session;
     private Connection connection;
     private MessageProducer producer;
@@ -32,23 +30,24 @@ public class Producer {
         
     
     private void createConnection() throws JMSException {
-       ConnectionFactory connectionFactory =
+        String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+        ConnectionFactory connectionFactory =
            new ActiveMQConnectionFactory(url);
-       Connection connection = connectionFactory.createConnection();
-       connection.start();
+        connection = connectionFactory.createConnection();
+        connection.start();
 
-       Session session = createSession();
-       Destination destination = createDestiantion(subject);
-       MessageProducer messageProducer = createMessageProducer(destination);
+        session = createSession();
+        String subject = "json_topic";
+        Destination destination = createDestiantion(subject);
+        producer = createMessageProducer(destination);
     }
 
     private Session createSession() throws JMSException {
-
         return connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
     private Destination createDestiantion(String queueName) throws JMSException {
-        return session.createTopic(queueName);
+        return session.createQueue(queueName);
     }
 
     private MessageProducer createMessageProducer(Destination destination) throws JMSException {
@@ -59,8 +58,9 @@ public class Producer {
 
     
     private void sendTextMessage(String themessage) throws JMSException {
-//		TODO maak de message aan
-//      TextMessage msg = ??????;
-//      producer.send(msg);
+        TextMessage msg = session.createTextMessage(themessage);
+        System.out.println(msg);
+
+        producer.send(msg);
     }    
 }
