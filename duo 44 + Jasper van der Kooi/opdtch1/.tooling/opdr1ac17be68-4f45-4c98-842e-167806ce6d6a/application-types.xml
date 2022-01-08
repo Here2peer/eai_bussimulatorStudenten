@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="json1" format="json">
+      <types:shape format="weave" example="examples/example1-1.json"><![CDATA[%dw 2.0
+
+type json1 = {|
+  tijd: Number {"typeId": "int"}, 
+  aankomsttijd: Number {"typeId": "int"}, 
+  lijnNaam: String, 
+  busID: String, 
+  bedrijf: String, 
+  eindpunt: String
+|} {"example": "{\\\"tijd\\\":15,\\\"aankomsttijd\\\":32,\\\"lijnNaam\\\":\\\"\u201DLIJN1\u201D\\\",\\\"busID\\\":\\\"\u201D3LIJN1R-1\u201D\\\",\\\"bedrijf\\\":\\\"\u201DARRIVA\u201D\\\",\\\"eindpunt\\\":\\\"\u201DA\u201D\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="xml1" format="xml">
+      <types:example format="xml" element="Bericht" location="examples/example.xml"/>
+    </types:type>
+    <types:type name="timeserverResponse" format="json">
+      <types:shape format="weave" example="examples/timeserverResponse.json"><![CDATA[%dw 2.0
+
+type timeserverResponse = {|
+  uur: Number {"typeId": "int"}, 
+  minuut: Number {"typeId": "int"}, 
+  seconde: Number {"typeId": "int"}
+|} {"example": "{\\\"uur\\\":5,\\\"minuut\\\":20,\\\"seconde\\\":43}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="timserverXML" format="xml">
+      <types:example format="xml" element="Tijd" location="examples/timeserverXML.xml"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#5ddd3162-03c2-4914-8b7b-9d887f39ce22">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="xml1"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#eb5bf4fe-bc2d-4a31-8bd0-a3f0cd740144">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="xml1"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#e7051510-dfa8-4363-b40e-0e9d24cabcc3">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="xml1"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#63e76312-e744-4b23-b8dd-049910c567ef">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="xml1"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#94409f1d-a20d-4c59-bee5-508cfb473cd4">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="json1"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#7ceb4e0e-4001-4170-a35d-a91b4c841621">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="timeserverResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#77bfe0a4-249f-4bfb-a75f-07007f1e74ec">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="timeserverResponse"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="timserverXML"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

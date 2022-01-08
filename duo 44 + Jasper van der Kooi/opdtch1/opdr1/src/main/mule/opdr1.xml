@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="c27c5c29-f952-4d51-acf8-ea3d01fcafc0" >
+		<jms:active-mq-connection >
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<wsc:config name="QBUZZ_Webservices" doc:name="Web Service Consumer Config" doc:id="932a065d-3b07-43bb-b6d1-de4b37e4fe68" >
+		<wsc:connection wsdlLocation="	http://localhost:8888/QBUZZServices?wsdl" service="QbuzzServicesService" port="QbuzzServicesPort" address="http://localhost:8888/QBUZZServices" />
+	</wsc:config>
+	<vm:config name="VM_Config_publish" doc:name="VM Config" doc:id="013ac5e7-b15d-48a7-9aaa-35c9eb6d9fbb">
+		<vm:connection />
+		<vm:queues >
+			<vm:queue queueName="testlistener" />
+			<vm:queue queueName="testdump" />
+		</vm:queues>
+	</vm:config>
+	<flow name="opdr1Flow" doc:id="d3c429ae-1ccc-49ac-b86f-cfa57a21c0df" >
+		<jms:listener doc:name="On New Message" doc:id="eb5bf4fe-bc2d-4a31-8bd0-a3f0cd740144" config-ref="JMS_Config1" destination="json_topic" inboundContentType="application/xml">
+			<jms:response outboundContentType="application/xml" />
+		</jms:listener>
+		<vm:publish doc:name="Publish" doc:id="d6e8582f-ba16-49d5-be9a-2ed195d123a0" config-ref="VM_Config_publish" queueName="testlistener" />
+		<foreach doc:name="For Each" doc:id="e7051510-dfa8-4363-b40e-0e9d24cabcc3" collection="#[output application/java&#10;---&#10;payload.Bericht.ETAs]">
+			<ee:transform doc:name="Transform Message" doc:id="02a2f2b0-497c-4394-9940-936a906dc2f1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	aankomsttijd: payload.ETA.aankomsttijd,
+	lijnNaam: vars.rootMessage.payload.Bericht.lijnNaam,
+	busID: vars.rootMessage.payload.Bericht.busID,
+	bedrijf: vars.rootMessage.payload.Bericht.bedrijf,
+	eindpunt: vars.rootMessage.payload.Bericht.eindpunt,
+	tijd: vars.rootMessage.payload.Bericht.tijd
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			<jms:publish doc:name="Publish" doc:id="70963b10-7258-4d73-88b5-58abd4989c14" config-ref="JMS_Config" destination="testlistener"/>
+		</foreach>
+	</flow>
+</mule>

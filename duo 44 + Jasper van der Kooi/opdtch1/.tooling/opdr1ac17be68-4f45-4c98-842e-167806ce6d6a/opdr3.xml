@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+	<http:listener-config name="HTTPtimneserver" doc:name="HTTP Listener config" doc:id="95ec930b-e1a4-4600-a164-69f0401ae266">
+		<http:listener-connection host="localhost" port="8089" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="6892e0cb-ab85-47da-90e9-42d794222105">
+		<http:request-connection host="localhost" port="5002" />
+	</http:request-config>
+	<flow name="opdr3Flow" doc:id="e04caaf0-59ed-4ad4-b370-a9a959aad11b" >
+		<http:listener doc:name="Listener" doc:id="7ceb4e0e-4001-4170-a35d-a91b4c841621" config-ref="HTTPtimneserver" path="/TijdServer">
+		</http:listener>
+		<set-variable value="#[attributes.queryParams.responseType]" doc:name="Set Variable" doc:id="a93ec8c1-1036-4d01-80cf-af618a250fcf" variableName="responseType"/>
+		<logger level="INFO" doc:name="Logger" doc:id="eba43202-f555-46ec-98a7-1bd615aa30a9" message="#[attributes.queryParams.responseType]"/>
+		<http:request method="GET" doc:name="Request" doc:id="6f1ffda3-3206-416b-a714-66f3250b0dc5" config-ref="HTTP_Request_configuration" path="/TimeServer">
+		</http:request>
+		<choice doc:name="Choice" doc:id="8645de87-899e-4b04-9323-9610eaafd908" >
+			<when expression='#[vars.responseType == "xml"]'>
+				<ee:transform doc:name="Transform Message" doc:id="77bfe0a4-249f-4bfb-a75f-07007f1e74ec" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	Tijd: {
+		uur: payload.uur,
+		minuut: payload.minuut,
+		seconde: payload.seconde
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+	</flow>
+</mule>
