@@ -1,4 +1,4 @@
-package mockDatabaseLogger;
+package DatabaseLogger;
 
 public class ETA {
 	String halteNaam;

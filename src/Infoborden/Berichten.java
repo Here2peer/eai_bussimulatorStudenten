@@ -10,9 +10,12 @@ public class Berichten {
 	private int hashValue;
 	private boolean refresh;
 	private String[] infoTekstRegels;
+	private String debugtext;
 	
 	public void nieuwBericht(String incoming) {
 		try {
+			debugtext = incoming;
+			System.out.println(debugtext);
 			JSONBericht bericht = new ObjectMapper().readValue(incoming, JSONBericht.class);
 	    	String busID = bericht.getBusID();
 	    	Integer tijd = bericht.getTijd();

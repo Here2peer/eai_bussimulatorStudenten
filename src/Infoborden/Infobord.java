@@ -1,5 +1,6 @@
 package Infoborden;
 
+import Tijdtools.InfobordTijdFuncties;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -32,9 +33,9 @@ public class Infobord extends Application{
 		if (berichten.hetBordMoetVerverst()) {
 			String[] infoTekstRegels = berichten.repaintInfoBordValues();
 //			Deze code hoort bij opdracht 3
-//			InfobordTijdFuncties tijdfuncties = new InfobordTijdFuncties();
-//			String tijd = tijdfuncties.getCentralTime().toString();
-//			tijdRegel.setText(tijd);
+			InfobordTijdFuncties tijdfuncties = new InfobordTijdFuncties();
+			String tijd = tijdfuncties.getCentralTime().toString();
+			tijdRegel.setText(tijd);
 			infoRegel1.setText(infoTekstRegels[0]);
 			infoRegel2.setText(infoTekstRegels[1]);
 			infoRegel3.setText(infoTekstRegels[2]);
@@ -55,8 +56,8 @@ public class Infobord extends Application{
 	@Override
 	public void start(Stage primaryStage) {
 //		TODO maak de selector aan
-//		String selector = ??????;
-//		thread(new ListenerStarter(selector, this, berichten),false);
+		String selector = "(HALTE = '" + halte + "') AND (RICHTING='" + richting + "')";
+		thread(new ListenerStarter(selector, this, berichten),false);
 		GridPane pane = new GridPane();
 		pane.setAlignment(Pos.CENTER_LEFT);
 		pane.setPadding(new Insets(11.5, 12.5, 13.5, 14.5));
