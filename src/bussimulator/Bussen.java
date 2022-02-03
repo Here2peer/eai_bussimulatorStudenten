@@ -11,6 +11,7 @@ public class Bussen {
 
     public static Map<Integer,ArrayList<Bus>> busStart = new HashMap<Integer,ArrayList<Bus>>();
     public static List<Bus> actieveBussen = new ArrayList<Bus>();
+    public BusFunctions busFunctions = new BusFunctions();
 
     public static int initBussen(){
         Bus bus1=new Bus(Lijnen.LIJN1, Bedrijven.ARRIVA, 1);
@@ -98,9 +99,9 @@ public class Bussen {
         Iterator<Bus> itr = actieveBussen.iterator();
         while (itr.hasNext()) {
             Bus bus = itr.next();
-            boolean eindpuntBereikt = bus.move();
-            if (eindpuntBereikt) {
-                bus.sendLastETA(nu);
+            bus.move();
+            if(bus.getTotVolgendeHalte() == 0 && bus.isEindPuntBereikt()) {
+                BusFunctions.sendLastETA(nu, bus);
                 itr.remove();
             }
         }
@@ -110,7 +111,7 @@ public class Bussen {
         Iterator<Bus> itr = actieveBussen.iterator();
         while (itr.hasNext()) {
             Bus bus = itr.next();
-            bus.sendETAs(nu);
+            BusFunctions.sendETAs(nu, bus);
         }
     }
 }

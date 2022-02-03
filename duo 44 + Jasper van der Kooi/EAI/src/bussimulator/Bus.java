@@ -43,7 +43,7 @@ public class Bus{
 		else {
 			System.out.printf("Bus %s heeft halte %s, richting %d bereikt.%n", 
 					lijn.name(), lijn.getHalte(halteNummer), lijn.getRichting(halteNummer)*richting);		
-			naarVolgendeHalte();
+			setTotVolgendeHalte();
 		}		
 		return false;
 	}
@@ -52,7 +52,7 @@ public class Bus{
 		halteNummer = (richting==1) ? 0 : lijn.getLengte()-1;
 		System.out.printf("Bus %s is vertrokken van halte %s in richting %d.%n", 
 				lijn.name(), lijn.getHalte(halteNummer), lijn.getRichting(halteNummer)*richting);		
-		naarVolgendeHalte();
+		setTotVolgendeHalte();
 	}
 	
 	public boolean move(){
