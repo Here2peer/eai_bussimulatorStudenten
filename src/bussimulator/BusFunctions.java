@@ -3,9 +3,6 @@ package bussimulator;
 import com.thoughtworks.xstream.XStream;
 
 public class BusFunctions {
-    private Bus bus;
-
-
 
     public static void sendETAs(int nu, Bus bus){
         int i=0;

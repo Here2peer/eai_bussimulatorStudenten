@@ -16,21 +16,40 @@ public class SendMessage {
     private Destination destination;
 
     public void sendBericht(String bericht) {
-    	try {
-            String subject = "xml_queue";
-    		CreateConnection createConnection = new CreateConnection();
+        setUpMessageNecessities();
+
+        try {
+            sendTextMessage(bericht);
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+
+        shutDownMessageNecessities();
+
+    }
+
+    private void setUpMessageNecessities(){
+        try {
+            CreateConnection createConnection = new CreateConnection();
             connection = createConnection.getConnection();
             CreateSession createSession = new CreateSession(connection);
             session = createSession.getSession();
-            CreateDestination createDestination = new CreateDestination(subject,session);
+            CreateDestination createDestination = new CreateDestination("xml_queue", session);
             destination = createDestination.getDestination();
             CreateMessageProducer createMessageProducer = new CreateMessageProducer(session, destination);
             producer = createMessageProducer.getProducer();
-    		sendTextMessage(bericht);
+        }
+        catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void shutDownMessageNecessities(){
+        try {
             connection.close();
-    	} catch (JMSException e) {
-    		e.printStackTrace();
-    	}
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendTextMessage(String themessage) throws JMSException {

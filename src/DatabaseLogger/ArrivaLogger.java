@@ -1,31 +1,25 @@
 package DatabaseLogger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
+import javax.jms.*;
+
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import com.thoughtworks.xstream.XStream;
 
 public class ArrivaLogger implements Runnable{
+	private Session session;
+	private Connection connection;
+	private MessageConsumer consumer;
 
 	@Override
 	public void run() {
 
 		try {
-			ActiveMQConnectionFactory connectionFactory = 
-					new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
-			Connection connection = connectionFactory.createConnection();
-			connection.start();
-			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Destination destination = session.createQueue("ARRIVALOGGER");
-			MessageConsumer consumer = session.createConsumer(destination);
+			createConsumer();
 			boolean newMessage=true;
 			int aantalBerichten=0;
 			int aantalETAs=0;
+
 			while (newMessage) {
 				Message message = consumer.receive(2000);
 				newMessage=false;
@@ -43,13 +37,39 @@ public class ArrivaLogger implements Runnable{
 					System.out.println("Received: " + message);
 				}            	
 			}
-			consumer.close();
-			session.close();
-			connection.close();
+
+			closeConsumer();
+
 			System.out.println(aantalBerichten + " berichten met " + aantalETAs + " ETAs verwerkt.");
 		} catch (Exception e) {
 			System.out.println("Caught: " + e);
 			e.printStackTrace();
 		}
+	}
+
+	private void createConsumer(){
+		try {
+			ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
+			this.connection = connectionFactory.createConnection();
+			connection.start();
+			this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Destination destination = session.createQueue("ARRIVALOGGER");
+			this.consumer = session.createConsumer(destination);
+		}
+		catch(JMSException e){
+			e.printStackTrace();
+		}
+	}
+
+	private void closeConsumer(){
+		try {
+			this.consumer.close();
+			this.session.close();
+			this.connection.close();
+		}
+		catch(JMSException e){
+			e.printStackTrace();
+		}
+
 	}
 }
